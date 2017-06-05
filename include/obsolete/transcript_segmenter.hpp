@@ -114,38 +114,25 @@ private:
                                   std::vector< TranscriptJob * > &transcripts,
                                   std::unordered_map<size_t, GraphT> &subgraphMap) {
 
-        LOG(DEBUG) << "in _partitionIntoSubgraphs\n";
-
         // Create a metis graph from our boost graph
         graphdef mG;
         int wgtflag {1}; // we have edge weights
 
-        LOG(DEBUG) << "calling boostToMetis\n";
 
         utils::graph::boostToMetis( G, &mG );
-
-        LOG(DEBUG) << "done boost to metis\n";
-        LOG(DEBUG) << "num verts = " << mG.nvtxs << ", num edges = " << mG.nedges << "\n";
 
         // Hold the partitions
         idxtype *part = new idxtype[mG.nvtxs];
 
-        LOG(DEBUG) << "alloctated new partition vector\n";
 
         // Initialize the clustering options
         Options opt;
         initOptions(&opt);
         opt.matchType = MATCH_SHEMN;
 
-        LOG(DEBUG) << "calling mlmcl\n";
-        LOG(DEBUG) << "num verts = " << mG.nvtxs << ", num edges = " << mG.nedges << "\n";
-        LOG(DEBUG) << "num edges 2 (should = num edges) = " << mG.xadj[mG.nvtxs] << "\n";
-
         // Call the clustering procedure
         mlmcl(&mG.nvtxs, mG.xadj, mG.adjncy, mG.vwgt,
               mG.adjwgt, &wgtflag, part, opt );
-
-        LOG(DEBUG) << "done mlmcl\n";
 
         size_t numClust {0};
         // Create the subgraphs

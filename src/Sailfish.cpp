@@ -52,11 +52,6 @@
 #include <jellyfish/misc.hpp>
 #include <jellyfish/compacted_hash.hpp>
 
-#if HAVE_LOGGER
-#include "g2logworker.h"
-#include "g2log.h"
-#endif
-
 #include "BiasIndex.hpp"
 #include "SailfishUtils.hpp"
 #include "GenomicFeature.hpp"
@@ -162,12 +157,6 @@ int runIterativeOptimizer(int argc, char* argv[] ) {
 
     bfs::path logDir = outputFilePath.parent_path() / "logs";
 
-#if HAVE_LOGGER
-    std::cerr << "writing logs to " << logDir.string() << "\n";
-    g2LogWorker logger(argv[0], logDir.string());
-    g2::initializeLogging(&logger);
-#endif
-
     double minMean = vm["filter"].as<double>();
     string lutprefix = vm["lutfile"].as<string>();
     auto tlutfname = lutprefix + ".tlut";
@@ -181,9 +170,6 @@ int runIterativeOptimizer(int argc, char* argv[] ) {
       string tgmFile = sfIndexBase+".tgm";
       std::cerr << "Reading the transcript <-> gene map from [" <<
                    tgmFile << "]\n";
-#if HAVE_LOGGER
-      LOG(INFO) << "Read transcript <=> gene map from [" << tgmFile << "]";
-#endif
       std::ifstream ifs(tgmFile, std::ios::binary);
       boost::archive::binary_iarchive ia(ifs);
       ia >> tgm;

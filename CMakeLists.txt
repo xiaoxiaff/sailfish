@@ -38,7 +38,7 @@ if ("${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
 else()
     # We're in sane linux world
     set (CMAKE_CXX_FLAGS "-DHAVE_LOGGER ${CMAKE_CXX_FLAGS}")
-    set (HAVE_LOGGER TRUE)
+    set (HAVE_LOGGER FALSE)
     set (SHARED_LIB_EXTENSION "so")
     set (LIBSAILFISH_LINKER_FLAGS "")
 endif()
@@ -334,7 +334,7 @@ ExternalProject_Add(libshark
     BUILD_IN_SOURCE 1
     UPDATE_COMMAND ""
 )
-
+set(HAVE_LOGGER FALSE)
 if(HAVE_LOGGER)
 message("Build system will compile g2log logging library")
 message("==================================================================")
