@@ -80,7 +80,7 @@ struct ContainingTranscript{
  * This function builds both a kmer => transcript and transcript => kmer
  * lookup table.
  */
-int buildLUTs(
+std::string  buildLUTs(
   const std::vector<std::string>& transcriptFiles, //!< File from which transcripts are read
   PerfectHashIndex& transcriptIndex,               //!< Index of transcript kmers
   CountDBNew& transcriptHash,                      //!< Count of kmers in transcripts
@@ -130,6 +130,14 @@ int buildLUTs(
 
   // Start the thread that will print the progress bar
   std::cerr << "Number of kmers : " << transcriptHash.size() << "\n";
+  std::fstream myfile;
+  std::string str = "";
+  myfile.open("duck1.txt");
+  std::cout<<"tuyukai output======================!!!!!!!!!!!!!!!\n";
+  myfile << "num of kmers"<<transcriptHash.size() <<"\n";
+  str += std::string("num of kmers");
+  str += std::to_string(transcriptHash.size());
+  str += std::string("\n");
   std::cerr << "Parsing transcripts and building k-mer equivalence classes\n";
 
   threads.push_back( std::thread( [&numRes, &nworking, numTranscripts] () {
@@ -304,6 +312,11 @@ int buildLUTs(
    *  For each transcript, we keep a list of the equivalence classes it contains.
    **/
   size_t numEquivClasses = (*max_element(membership.cbegin(), membership.cend())) + 1;
+  myfile<<"numOfEquivClass"<<numEquivClasses<<"\n";
+
+  str += std::string("num of equivClass");
+  str += std::to_string(numEquivClasses);
+  str += std::string("\n");
   vector<TranscriptList> transcriptsForKmerClass(numEquivClasses);
   tbb::concurrent_queue<ContainingTranscript> q;
   tbb::concurrent_queue<TranscriptInfo*> tq;
@@ -394,11 +407,17 @@ int buildLUTs(
   for (auto& t : threads) { t.join(); }
 
   std::cerr << "writing k-mer equiv class lookup table . . . ";
-  std::cerr << "table size = " << transcriptsForKmerClass.size() << " . . . ";
+  myfile<<"tforktable size:"<<transcriptsForKmerClass.size()<<"\n";
+  str += std::string("tforktable size");
+  str += std::to_string(transcriptsForKmerClass.size());
+  str += std::string("\n");
+  std::cerr << "table size yutu = " << transcriptsForKmerClass.size() << " . . . ";
   LUTTools::dumpKmerLUT(transcriptsForKmerClass, klutfname);
   std::cerr << "done\n";
 
-  return 0;
+  myfile.close();
+
+  return str;
 }
 
 /**

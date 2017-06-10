@@ -109,11 +109,13 @@ void readKmerLUT(
     const std::string &fname,
     std::vector<TranscriptList> &transcriptsForKmer) {
 
+    std::cerr<<"fname"<<fname<<"\n";
     std::ifstream ifile(fname, std::ios::binary);
     // get the size of the vector from file
     size_t numk = 0;
     ifile.read(reinterpret_cast<char *>(&numk), sizeof(numk));
     // resize the vector now
+
     transcriptsForKmer.resize(numk);
 
     for (auto i : boost::irange(size_t(0), numk)) {

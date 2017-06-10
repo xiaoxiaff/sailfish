@@ -56,9 +56,9 @@ int runIterativeOptimizer(int argc, char* argv[]) {return 1;}
 /**
 * Type aliases
 */
-using TranscriptID = uint32_t;
-using TranscriptIDVector = std::vector<TranscriptID>;
-using KmerIDMap = std::vector<TranscriptIDVector>;
+using MTranscriptID = uint32_t;
+using MTranscriptIDVector = std::vector<MTranscriptID>;
+using MKmerIDMap = std::vector<MTranscriptIDVector>;
 
 int main(int argc, char* argv[]) {
   using std::string;
@@ -140,23 +140,33 @@ int main(int argc, char* argv[]) {
     auto hash = CountDBNew::fromFile( hashFile, sfIndexPtr );
     std::cerr << "done\n";
     //const std::vector<string>& geneFiles{genesFile};
+
+    std::cerr << "1\n";
     auto merLen = sfIndex.kmerLength();
-
-    KmerIDMap transcriptsForKmer;
-
+std::cerr << "1\n";
+    MKmerIDMap transcriptsForKmer;
+std::cerr << "1\n";
     // Get the kmer look-up-table from file
     LUTTools::readKmerLUT(klutfname, transcriptsForKmer);
-
+std::cerr << "1\n";
     // For each kmer
     size_t unique = 0;
 	size_t uniqueAndMappable = 0;
 	size_t mappable = 0;
 	size_t totalCountedKmers = 0;
 	size_t uniquelyMappedCount = 0;
+  std::cerr<<hash.size()<<"\n";
     for(auto kmerIdx : boost::irange(size_t{0}, hash.size())) {
+      std::cerr<<kmerIdx<<std::endl;
     	size_t countInReads = hash.atIndex(kmerIdx);
     	// Does is map to only a single transcript?
+      std::cerr<<"kmer how man trans"<<transcriptsForKmer[kmerIdx].size()<<std::endl;
+      std::cerr<<"counts in reads"<<countInReads<<std::endl;
+      if (kmerIdx == transcriptsForKmer.size()) {
+        break;
+      }
     	if (countInReads >= 0) {
+        auto tgv = transcriptsForKmer[kmerIdx];
     		unique += (transcriptsForKmer[kmerIdx].size() <= 1) ? 1 : 0;
     	}
 	  	if (countInReads >= 1 ) {
@@ -164,9 +174,11 @@ int main(int argc, char* argv[]) {
     		uniquelyMappedCount += (transcriptsForKmer[kmerIdx].size() <= 1) ? countInReads : 0;
     		mappable++;
     	}
+
+      std::cerr<<kmerIdx<<std::endl;
     	totalCountedKmers += countInReads;
     }
-    
+    std::cerr << "1\n";
     std::cerr << "There were " << unique << " unique k-mers\n";
     std::cerr << "This is " << 100.0 * (static_cast<double>(unique)/hash.size()) << "% of all kmers\n";
 	std::cerr << "There were " << uniqueAndMappable << " unique & mapped k-mers\n";

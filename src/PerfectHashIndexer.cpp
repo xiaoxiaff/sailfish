@@ -221,7 +221,7 @@ int runJellyfish(bool canonical,
     */
 }
 
-void buildLUTs(
+std::string buildLUTs(
   const std::vector<std::string>& transcriptFiles, //!< File from which transcripts are read
   PerfectHashIndex& transcriptIndex,               //!< Index of transcript kmers
   CountDBNew& transcriptHash,                      //!< Count of kmers in transcripts
@@ -325,6 +325,7 @@ the Jellyfish database [thash] of the transcripts.
         boost::filesystem::create_directory(logDir);
 
 
+
         // First, compute the transcript features in case the user
         // ever wants to bias-correct his / her results
         bfs::path transcriptBiasFile(outputPath); transcriptBiasFile /= "bias_feats.txt";
@@ -357,6 +358,12 @@ the Jellyfish database [thash] of the transcripts.
 
             hash_query_t transcriptHash(thashFile.c_str());
             std::cerr << "transcriptHash size is " << transcriptHash.get_distinct() << "\n";
+            std::ofstream myfile;
+            myfile.open ("duck2.txt");
+            std::cout<<"tuyukai output for duck======================!!!!!!!!!!!!!!!\n";
+            myfile << "transcriptHash size"<<transcriptHash.get_distinct() <<"\n";
+            myfile << "mer len"<<transcriptHash.get_mer_len() <<"\n";
+
             size_t nkeys = transcriptHash.get_distinct();
             size_t merLen = transcriptHash.get_mer_len();
 
@@ -400,6 +407,8 @@ the Jellyfish database [thash] of the transcripts.
                 boost::archive::binary_oarchive oa(ofs);
                 // write class instance to archive
                 oa << tgmap;
+                myfile<<"numTranscripts"<<tgmap.numTranscripts()<<"\n";
+                myfile<<"numGene"<<tgmap.numGenes()<<"\n";
             } // archive and stream closed when destructors are called
 
             bfs::path sfIndexPath(outputPath); sfIndexPath /= "transcriptome.sfi";
@@ -417,8 +426,10 @@ the Jellyfish database [thash] of the transcripts.
             bfs::path tlutPath(outputPath); tlutPath /= "transcriptome.tlut";
             bfs::path klutPath(outputPath); klutPath /= "transcriptome.klut";
 
-            buildLUTs(transcriptFiles, sfIndex, sfTranscriptCountIndex,
+            std::string str = buildLUTs(transcriptFiles, sfIndex, sfTranscriptCountIndex,
                       tgmap, tlutPath.string(), klutPath.string(), numThreads);
+            myfile<<str;
+            myfile.close();
 
         } else {
             std::cerr << "All index files seem up-to-date.\n";
